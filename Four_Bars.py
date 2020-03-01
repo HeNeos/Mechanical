@@ -45,12 +45,7 @@ line4, = plt.plot([0],[np.sin(9)],'-b')
 frr = np.linspace(0,50,1000+1)
 
 def ff(t):
-    #return math.pi*(math.sin(math.sin(math.sin(t)+math.cos(t))))+math.log(1+t)
     return math.pi*(math.sin(math.sin(math.sin(t)+math.cos(t))))-math.pi*math.sin(math.sqrt(t))-math.exp(1)*math.cos(math.sqrt(t))
-    #return 2*math.sin(math.sqrt(t))*math.log(1+math.sqrt(t))*math.sin(math.sqrt(t)*math.cos(math.sqrt(t)*math.sin(t)))
-    #return math.sin(t*math.cos(t*math.sin(t)))
-    #return math.exp(math.sqrt(t)*math.sin(math.sqrt(t))+math.cos(math.sqrt(t)))
-    #return math.exp(math.sin(t))**0.8
     #return math.log(math.sin(t)+1.5+math.cos(t))
     
 def upd(frame):

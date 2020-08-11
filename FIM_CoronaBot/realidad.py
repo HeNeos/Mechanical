@@ -3,7 +3,7 @@ from webbot import Browser
 import time
 name = "Josue Huaroto"
 email = "josue.huaroto.v@uni.pe"
-link = "https://unidemo.webex.com/meet/huaman1942"
+link = "https://unidemo.webex.com/unidemo/e.php?MTID=m4ff5ebd3849b3d6b4608d8efecc23c2a"
 T = 117*60 #TOTAL TIME, 117 mins
 
 info = name + '\t' + email
@@ -25,7 +25,7 @@ web.press(web.Key.ENTER)
 
 for i in range(0,2):
     _try()
-web.type(info)
+web.type(data)
 web.press(web.Key.ENTER)
 
 for i in range(0,2):

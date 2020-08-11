@@ -5,7 +5,7 @@ Run background processes, only available on Linux. For Windows, you can find alt
 
 crontab contains information on WHAT and WHEN to perform an action, in this case run the scripts. For example, if you need to join a webex meeting at 4pm on Tuesdays, you need to tell crontab the time, day, and path to the script for that meeting.
 
-You must edit crontab according to your schedule and the name of the scripts you need to run; check that the route is correct and the time as well
+You must edit crontab according to your schedule and the name of the scripts you need to run; check that the path is correct and the time as well
 
 ## earp.py
 earp.py is the script in charge of attendance dialing, this script is distinct from the others because the link is always the same and in crontab it must tell you what time you need to execute it.

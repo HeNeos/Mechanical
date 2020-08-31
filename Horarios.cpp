@@ -1,5 +1,13 @@
 #include<bits/stdc++.h>
 using namespace std;
+typedef long long ll;
+typedef vector<int> vi;
+typedef pair<int,int> pii;
+typedef pair<double,double> pdd;
+typedef vector<double> vd;
+#define u_map unordered_map
+#define pb push_back
+#define mp make_pair
 /*
 INPUT:
 BEG01: ECONOMIA GENERAL
@@ -22,160 +30,202 @@ BRN01: REALIDAD NACIONAL, CONSTITUCIÓN
 A T LU 17-19 A2-239 COGORNO, Carlos
 A P MA 17-19 A2-360 COGORNO, Carlos
 */
-vector <vector <int> > answ;
-vector <pair <int,int> > comparador;
-unordered_map <string,int> days;
-bool cmp(pair <int,int> a, pair<int,int> b){
+vector <vi> answ;
+vector <pii> cross;
+u_map <string,int> days;
+u_map <string, u_map <string, u_map <string, int[24] > > > ALL;
+vector <pair<string,int> > data_courses;
+
+bool cmp(pii a, pii b){
 	if(a.first >= b.first) return false;
 	else return true;
 }
-int main(){
-  ios_base::sync_with_stdio(false);
-	cin.tie(NULL);
-	days["LU"] = 0,days["MA"] = 1, days["MI"]=2,days["JU"]=3,days["VI"]=4, days["SA"]=5;	
-	unordered_map <string, unordered_map<string, unordered_map<string, int[24] > > > ALL;
-	vector <pair<string,int> > AUXCursos;
-	while(true){
-		string Cursos;
-		getline(cin,Cursos);
-		if(Cursos.size() == 0) break;
-		AUXCursos.push_back(make_pair(Cursos,0));
-		unordered_map <string, unordered_map<string,int[24]> > mm;
-		set <string> cantSec;
-		while(true){
-			string Secciones = "";
-			string tst;
-			getline(cin,tst);
-			int posx = 0;
-			if(tst.size() == 0) break;
-			if(tst == "*") break;
-			for(int i=posx; i<tst.size(); i++){
-				if(tst[i] == ' '){
-					posx = i+1;
-					break;
-				}
-				Secciones += tst[i];
-			}
-			bool DetectMultiSecciones = false;
-			string MultiSecciones = "";
-			if(Secciones.size() > 1){
-				DetectMultiSecciones = true;
-				for(int i=0; i<Secciones.size(); i++){
-					if(i%2 == 1) continue;
-					MultiSecciones += Secciones[i];
-					string sx = "";
-					sx += Secciones[i];
-					cantSec.insert(sx);
-				}
-			}
-			else cantSec.insert(Secciones);
-			for(int i=posx; i<tst.size(); i++){
-				if(tst[i] == ' '){
-					posx = i+1;
-					break;
-				}
-			}
-			string Dia = "";
-			for(int i=posx; i<tst.size(); i++){
-				if(tst[i] == ' '){
-					posx = i+1;
-					break;
-				}
-				Dia += tst[i];
-			}
-			string Hora = "";
-			for(int i=posx; i<tst.size(); i++){
-				if(tst[i] == ' '){
-					posx = i;
-					break;
-				}
-				Hora += tst[i];
-			}
+
+bool Read_input(string &line){
+	getline(cin,line);
+	if(!line.size()) return false;
+	else return true;
+}
+
+void Read_section(int &posx, string &tst, string &s_p_c){
+	for(int i=posx; i<(int)tst.size(); i++){
+		if(tst[i] == ' '){
+			posx = i+1;
+			break;
+		}
+		s_p_c += tst[i];
+	}
+}
+
+void Read_day(int &posx, string &tst, string &Day){
+	for(int i=posx; i<(int)tst.size(); i++){
+		if(tst[i] == ' '){
+			posx = i+1;
+			break;
+		}
+		Day += tst[i];
+	}
+}
+
+void Read_hour(int &posx, string &tst, string &Hour){
+	for(int i=posx; i<(int)tst.size(); i++){
+		if(tst[i] == ' '){
+			posx = i;
+			break;
+		}
+		Hour += tst[i];
+	}
+}
+void Read_SE(int &l, int &r, string &Hour){
+	string aux = "";
+	for(int i=0; i<2; i++) aux += Hour[i];
+	l = stoi(aux);
+	aux = "";
+	for(int i=3; i<5; i++) aux += Hour[i];
+	r = stoi(aux);
+}
+
+void Insert_MultiSections(string &SPC, bool &DM, string &MS, set <string> &AS){
+	if(SPC.size() > 1){
+		DM = true;
+		for(int i=0; i<(int)SPC.size(); i++){
+			MS += SPC[i];
 			string aux = "";
-			for(int i=0; i<2; i++) aux += Hora[i];
-			int l = stoi(aux);
-			aux = "";
-			for(int i=3; i<5; i++) aux += Hora[i];
-			int r = stoi(aux);
-			if(DetectMultiSecciones){
-				for(int j=0; j<MultiSecciones.size(); j++){
-					for(int i=l; i<=r-1; i++){
-						string SectionC = "";
-						SectionC += MultiSecciones[j];
-						mm[SectionC][Dia][i] = 1;
-					}
-				}
-			}
-			else{
-				for(int i=l; i<=r-1; i++){
-					mm[Secciones][Dia][i] = 1;
-				}
+			aux += SPC[i];
+			AS.insert(aux);
+		}
+	}
+	else AS.insert(SPC);
+}
+
+void Add_sections(bool &DMS, string &MS, int &l, int &r, string &Day, string &SPC, u_map <string, u_map <string,int[24]> > &m){
+	if(DMS){
+		for(int j=0; j<(int)MS.size(); j++){
+			for(int i=l; i<=r-1; i++){
+				string current_section = "";
+				current_section += MS[j];
+				m[current_section][Day][i] = 1;
 			}
 		}
-		AUXCursos[AUXCursos.size()-1].second = cantSec.size();
-		ALL[Cursos] = mm;		
 	}
-	int it[AUXCursos.size()-1];
-	for(int i=0; i<AUXCursos.size(); i++) it[i] = 0;
+	else{
+		for(int i=l; i<=r-1; i++){
+			m[SPC][Day][i] = 1;
+		}
+	}
+}
+
+void Fill_schedule(int &contc, vi &it){
+	int current_schedule[24][7];
+	for(int i=0; i<24; i++){
+		for(int j=0; j<7; j++) current_schedule[i][j] = 0;
+	}
+	for(int k=0; k<(int)data_courses.size(); k++){
+		string current_course = data_courses[k].first;
+		int contk = 0;
+		string current_section = "";
+		for(auto i:ALL[current_course]){
+			if(contk == it[k]){
+				current_section += i.first;
+				break;
+			}
+			contk++;
+		}	
+		for(auto i:ALL[current_course][current_section]){
+			string current_day = i.first;
+			for(int x=0; x<24; x++) current_schedule[x][days[current_day]] += i.second[x];
+		}
+		for(int i=0; i<24; i++){
+			for(int j=0; j<7; j++){
+				if(current_schedule[i][j] != 0) contc += current_schedule[i][j]-1;
+			}
+		}
+	}
+}
+
+void output(){
+	sort(cross.begin(), cross.end(), cmp);
+	for(int i=0; i<(int)cross.size(); i++){
+		cout << "Cruces = " << cross[i].first << '\n';
+		int _posid = cross[i].second;
+		for(int j=0; j<(int)answ[_posid].size(); j++){
+			cout << data_courses[j].first << ":";
+			string course_section = "";
+			int contb = 0;
+			for(auto k:ALL[data_courses[j].first]){
+				if(contb == answ[_posid][j]){
+					course_section += k.first;
+					break;
+				}
+				contb++;
+			}
+			cout << course_section << '\n';
+		}
+		cout << '\n';
+	}
+}
+
+int main(){
+  	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	days["LU"] = 0,days["MA"] = 1, days["MI"]=2,days["JU"]=3,days["VI"]=4, days["SA"]=5;		
+	while(true){
+		string line;
+		if(!Read_input(line)) break;
+		
+		data_courses.pb(mp(line,0));
+		u_map <string, u_map<string,int[24]> > schedule;
+		set <string> amount_of_sections;
+		while(true){
+			string sections_per_course = "";
+			string tst;
+			if(!Read_input(tst)) break;
+			if(tst == "*") break;
+			
+			int posx = 0;
+			Read_section(posx,tst,sections_per_course);
+			bool DetectMultiSections = false;
+			
+			string MultiSections = "";
+			Insert_MultiSections(sections_per_course, DetectMultiSections, MultiSections, amount_of_sections);
+
+			for(int i=posx; i<(int)tst.size(); i++){
+				if(tst[i] == ' '){
+					posx = i+1;
+					break;
+				}
+			}
+
+			string Day = "";
+			Read_day(posx, tst, Day);
+			string Hour = "";
+			Read_hour(posx, tst, Hour);
+
+			int _start_hour, _end_hour;
+			Read_SE(_start_hour,_end_hour,Hour);
+			
+			Add_sections(DetectMultiSections, MultiSections, _start_hour, _end_hour, Day, sections_per_course, schedule);
+		}
+		data_courses[data_courses.size()-1].second = amount_of_sections.size();
+		ALL[line] = schedule;		
+	}
+	vi it(data_courses.size());
 	while(true){
 		int contc = 0;
-		int horario[24][7];
-		for(int i=0; i<24; i++){
-			for(int j=0;j<7; j++) horario[i][j] = 0;
-		}
-		for(int k=0; k<AUXCursos.size(); k++){
-			string CurrentCourse = AUXCursos[k].first;
-			int contk = 0;
-			string CurrentSection = "";
-			for(auto ll:ALL[CurrentCourse]){
-				if(contk == it[k]){
-					CurrentSection += ll.first;
-					break;
-				}
-				contk++;
-			}
-			for(auto i:ALL[CurrentCourse][CurrentSection]){
-				string CurrentDay = i.first;
-				for(int x=0; x<24; x++) horario[x][days[CurrentDay]] += i.second[x];
-			}
-			for(int i=0;i<24;i++){
-				for(int j=0; j<7; j++){
-					if(horario[i][j] != 0) contc += horario[i][j]-1;	
-				}
-			}
-		}
-		vector <int> awa;
-		for(int i=0; i<AUXCursos.size(); i++) awa.push_back(it[i]);
-		answ.push_back(awa);
-		comparador.push_back(make_pair(contc,answ.size()-1));
+		Fill_schedule(contc, it);
+		answ.pb(it);
+		cross.pb(mp(contc,answ.size()-1));
 		it[0]++;
-		for(int i=1; i<AUXCursos.size(); i++){
-			if(it[i-1] >= AUXCursos[i-1].second){
+		for(int i=1; i<(int)data_courses.size(); i++){
+			if(it[i-1] >= data_courses[i-1].second){
 				it[i]++;
 				it[i-1] = 0;	
 			}
 			else break;
 		}
-		if(it[AUXCursos.size()-1] >= AUXCursos[AUXCursos.size()-1].second) break;
+		if(it[data_courses.size()-1] >= data_courses[data_courses.size()-1].second) break;
 	}
-	sort(comparador.begin(), comparador.end(), cmp);
-	for(int i=0; i<comparador.size(); i++){
-		cout << "Cruces = " << comparador[i].first << '\n';
-		int posix = comparador[i].second;
-		for(int j=0; j<answ[posix].size(); j++){
-			cout << AUXCursos[j].first << ":";
-			string answsec = "";
-			int contb = 0;
-			for(auto k:ALL[AUXCursos[j].first]){
-				if(contb == answ[posix][j]){
-					answsec += k.first;
-					break;
-				}
-				contb++;
-			}
-			cout << answsec << '\n';
-		}
-		cout << '\n';
-	}
+
+	output();	
 	return 0;
 }

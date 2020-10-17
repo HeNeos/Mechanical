@@ -88,7 +88,7 @@ void Read_SE(int &l, int &r, string &Hour){
 void Insert_MultiSections(string &SPC, bool &DM, string &MS, set <string> &AS){
 	if(SPC.size() > 1){
 		DM = true;
-		for(int i=0; i<(int)SPC.size(); i++){
+		for(int i=0; i<(int)SPC.size(); i+=2){
 			MS += SPC[i];
 			string aux = "";
 			aux += SPC[i];
